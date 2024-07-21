@@ -1,0 +1,1 @@
+void createPuzzle(Game * game);
