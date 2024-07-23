@@ -23,8 +23,11 @@ void createPuzzle(Game* game) {
     srand(time(NULL));
 
     // Fill the diagonal 3x3 boxes to ensure the puzzle is solvable
+    int count = 0;
     for (int i = 0; i < SIZE; i += 3) {
         fillBox(game, i, i);
+        
+        
     }
 
     // Further logic to ensure the rest of the board is filled can be added here
@@ -65,13 +68,20 @@ int isSafeToPlace(Game* game, int row, int col, int num) {
 
 
 int main() {
+    printf("Welcome to my Sudoku game - by Hila Kornis\n");
+    int fill_boxes = 3;
+    printf("Filling %d boxes from the sudoku\n", fill_boxes);
     Game game;
+    
     createPuzzle(&game);
 
     // Print the puzzle to verify
     for (int i = 0; i < SIZE; i++) {
+        if(i % 3 == 0) printf("\n");
         for (int j = 0; j < SIZE; j++) {
+            if(j % 3 == 0) printf("  ");
             printf("%2d ", game.puzzle[i][j]);
+            
         }
         printf("\n");
     }
