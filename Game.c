@@ -1,80 +1,82 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
-#define SIZE 9 
+#define SIZE 9
 
-typedef struct Game
-{
-    int ** puzzle;
+typedef struct {
+    int puzzle[SIZE][SIZE];
 } Game;
 
-int ** createPuzzle(Game * game){
-    int ** puzzle;
-    int i, j;
-    int array[SIZE][SIZE] = {
-        {0, 1, 9,    0,0,2,  0,0,0},
-        {4, 7, 0,    6,9,0,  0,0,1},
-        {0, 0, 0,     4,0,0,  0,9,0},
+// Function declarations
+void createPuzzle(Game* game);
 
-        {8, 9, 4,    5,0,7,  0,0,0},
-        {0, 0, 0,    0,9,0,  0,0,0},
-        {0, 0, 0,    2,0,1,  9,5,8},
-
-        {0, 5, 0,    0,0,6,  0,0,0},
-        {6, 0, 0,    0,2,8,  0,7,9},
-        {0, 0, 0,    1,0,0,  8,6,0},
-    };
-
-    puzzle = (int**) malloc (sizeof(int*)* SIZE);
-    for (size_t i = 0; i < SIZE; i++)
-    {
-        puzzle[i] = (int *) malloc(sizeof(int) * SIZE);
-        for (size_t j = 0; i < SIZE; i++)
-        {
-            puzzle[i][j] = array[i][j];
+void createPuzzle(Game* game) {
+    // Initialize the puzzle with zeros
+    for (int i = 0; i < SIZE; i++) {
+        for (int j = 0; j < SIZE; j++) {
+            game->puzzle[i][j] = 0;
         }
-        
     }
-    return puzzle;
+
+    // Seed random number generator
+    srand(time(NULL));
+
+    // Fill the diagonal 3x3 boxes to ensure the puzzle is solvable
+    for (int i = 0; i < SIZE; i += 3) {
+        fillBox(game, i, i);
+    }
+
+    // Further logic to ensure the rest of the board is filled can be added here
 }
 
-void freePuzzle(Game * game){
-    int ** puzzle = game->puzzle;
-    for (size_t i = 0; i < SIZE; i++)
-    {
-        // puzzle[i] = (int *) malloc(sizeof(int) * SIZE);
-        free(puzzle[i]);
+// Helper function to fill a 3x3 box
+void fillBox(Game* game, int row, int col) {
+    int num;
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 3; j++) {
+            do {
+                num = (rand() % 9) + 1;
+            } while (!isSafeToPlace(game, row + i, col + j, num));
+            game->puzzle[row + i][col + j] = num;
+        }
     }
-    free(puzzle);
 }
 
-void PrintPuzzle(Game * game){
-    int ** puzzle = game->puzzle;
-    for (size_t i = 0; i < SIZE; i++)
-    {
-        // printf("");
-        for (size_t j = 0; i < SIZE; i++){
-                
-                if(i % 3 == 0){
-                    printf("   %d", puzzle[i][j]);
-                } else {
-                    printf(" %d", puzzle[i][j]);
-                }
-                
+// Function to check if it's safe to place a number in a given cell
+int isSafeToPlace(Game* game, int row, int col, int num) {
+    for (int x = 0; x < SIZE; x++) {
+        if (game->puzzle[row][x] == num || game->puzzle[x][col] == num) {
+            return 0;
+        }
+    }
+
+    int startRow = row - row % 3;
+    int startCol = col - col % 3;
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 3; j++) {
+            if (game->puzzle[i + startRow][j + startCol] == num) {
+                return 0;
+            }
+        }
+    }
+    return 1;
+}
+
+
+int main() {
+    Game game;
+    createPuzzle(&game);
+
+    // Print the puzzle to verify
+    for (int i = 0; i < SIZE; i++) {
+        for (int j = 0; j < SIZE; j++) {
+            printf("%2d ", game.puzzle[i][j]);
         }
         printf("\n");
-    
     }
-    
-    
-}
-
-int main(){
-    printf("This is Game.c class. \n");
-    Game   game;// = (Game *) malloc(sizeof(Game));
-    createPuzzle(&game);
-    // PrintPuzzle(&game);
-    // freePuzzle(&game);
 
     return 0;
 }
+
+
